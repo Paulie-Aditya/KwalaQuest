@@ -2,10 +2,12 @@ import nextcord
 from nextcord.ext import commands
 from dotenv import load_dotenv, dotenv_values
 import os
+import requests
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8080")
 intents = nextcord.Intents.default()
 intents.message_content = True
 intents.members = True
@@ -23,8 +25,12 @@ async def register(ctx, *args):
     user_id = ctx.author.id
     user_to_wallet_mapping[user_id] = wallet_addy
     # this particular wallet address has to be now tracked
+    response =  requests.post(BACKEND_URL+"/add-wallet",
+                  json={"address": wallet_addy, "user_id":user_id})
+    if response.status_code != 200:
+        print(response)
 
-    ctx.send(f"<@{ctx.author.id}> has registered {wallet_addy}", ephermal = True)
+    await ctx.send(f"<@{ctx.author.id}> has registered {wallet_addy}")
 
 @bot.command(name="xp")
 async def xp(ctx):
@@ -33,7 +39,7 @@ async def xp(ctx):
         user_xp[user_id]
     except KeyError:
         user_xp[user_id] = 0
-    ctx.send(f"<@{ctx.author.id}> has {user_xp[user_id]} XP!")
+    await ctx.send(f"<@{ctx.author.id}> has {user_xp[user_id]} XP!")
 
 @bot.command(name="unregister")
 async def unregister(ctx):
@@ -41,7 +47,7 @@ async def unregister(ctx):
         del user_to_wallet_mapping[ctx.author.id]
     except KeyError:
         pass
-    ctx.send(f'<@{ctx.author.id}> has unregistered :(')
+    await ctx.send(f'<@{ctx.author.id}> has unregistered :(')
 
 @bot.event
 async def on_ready():

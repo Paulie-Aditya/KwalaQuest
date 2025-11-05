@@ -1,3 +1,4 @@
-nextcord 
+flask
 python-dotenv
+gunicorn
 requests

@@ -5,5 +5,4 @@ User performs on-chain action → Kwala detects it → triggers webhook → back
 | 1st transaction on chain      | ERC-20 Transfer      | “Newbie Trader” badge |
 | 10 transactions of same token | Transfer event count | Level up + XP         |
 | Holds > 1000 of token X       | Balance > threshold  | Rare “Whale” role     |
-| Mints first NFT               | ERC-721 Transfer     | NFT Collector badge   |
 | Signs up through bot          | `/register` command  | On-chain address bind |
