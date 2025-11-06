@@ -236,6 +236,7 @@ def holder_check(address, user_id, balance):
 @app.route("/transfer-event", methods=["POST"])
 def transfer_event():
     data = request.get_json()
+    print("Data from transfer event", data)
     from_address = data['from_address']
     try:
         wallet_to_user_id[from_address]
@@ -254,6 +255,7 @@ def transfer_event():
 @app.route("/holder-event", methods=["POST"])
 def holder_event():
     data = request.get_json()
+    print("Data from holder event", data)
     from_address = data['from_address']
     to_address = data['to_address']
     if to_address not in wallets:
