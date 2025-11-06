@@ -53,10 +53,67 @@ async def register(ctx, *args):
 async def xp(ctx):
     user_id = ctx.author.id
     try:
-        user_xp[user_id]
+        xp_points = user_xp[user_id]
     except KeyError:
-        user_xp[user_id] = 0
-    await ctx.send(f"<@{ctx.author.id}> has {user_xp[user_id]} XP!")
+        xp_points = user_xp[user_id] = 0
+    
+    current_level = get_level(xp_points)
+    next_level_xp = (current_level + 1) * 100
+    xp_needed = next_level_xp - xp_points
+
+    embed = nextcord.Embed(title="🎮 XP Status", color=0x00ff00)
+    embed.add_field(name="Current XP", value=str(xp_points), inline=True)
+    embed.add_field(name="Level", value=str(current_level), inline=True)
+    embed.add_field(name="XP to Next Level", value=str(xp_needed), inline=True)
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name="help")
+async def help_command(ctx):
+    embed = nextcord.Embed(
+        title="🏆 KwalaQuest Milestones",
+        description="Complete these milestones to earn roles and XP!",
+        color=0x00ff00
+    )
+    
+    # Trading Milestones
+    embed.add_field(
+        name="📈 Trading Achievements",
+        value="• First Transaction: Rookie Trader role + 20 XP\n"
+              "• 10 Transactions: Silver Trader role + 50 XP\n"
+              "• 50 Transactions: Gold Trader role + 500 XP",
+        inline=False
+    )
+    
+    # Whale Status
+    embed.add_field(
+        name="🐋 Whale Status",
+        value="• 1,000+ tokens: Gold WHALE + 200 XP\n"
+              "• 5,000+ tokens: Diamond WHALE + 500 XP\n"
+              "• 10,000+ tokens: Platinum WHALE + 1,000 XP",
+        inline=False
+    )
+    
+    # Level System
+    embed.add_field(
+        name="⭐ Level System",
+        value="• Every 100 XP = 1 Level\n"
+              "• Levels 1-10 available\n"
+              "• Each level grants a unique role",
+        inline=False
+    )
+    
+    # Commands
+    embed.add_field(
+        name="🤖 Available Commands",
+        value="• `!register <wallet>`: Link your wallet\n"
+              "• `!unregister`: Unlink your wallet\n"
+              "• `!xp`: Check your XP and level\n"
+              "• `!help`: Show this help message",
+        inline=False
+    )
+    
+    await ctx.send(embed=embed)
 
 @bot.command(name="unregister")
 async def unregister(ctx):
@@ -66,12 +123,46 @@ async def unregister(ctx):
         pass
     await ctx.send(f'<@{ctx.author.id}> has unregistered :(')
 
+def get_level(xp):
+    return xp // 1000  # Every 1000 XP is one level
+
+async def check_level_up(user_id, guild):
+    current_xp = user_xp[user_id]
+    current_level = get_level(current_xp)
+    
+    # Assign level roles
+    member = guild.get_member(int(user_id))
+    if member:
+        # Remove old level roles
+        for i in range(1, 11):
+            old_role = nextcord.utils.get(guild.roles, name=f"Level {i}")
+            if old_role and old_role in member.roles:
+                await member.remove_roles(old_role)
+        
+        # Add new level role if level is between 1-10
+        if 1 <= current_level <= 10:
+            new_role = nextcord.utils.get(guild.roles, name=f"Level {current_level}")
+            if new_role:
+                await member.add_roles(new_role)
+                channel = bot.get_channel(TARGET_CHANNEL_ID)
+                await channel.send(f"🎉 Congratulations <@{user_id}>! You've reached Level {current_level}!")
+
 def add_xp(user_id, amt):
     try:
-        user_xp[user_id]+= amt
+        old_level = get_level(user_xp[user_id])
+        user_xp[user_id] += amt
+        new_level = get_level(user_xp[user_id])
+        
+        if new_level > old_level:
+            guild = bot.get_guild(GUILD_ID)
+            if guild:
+                bot.loop.create_task(check_level_up(user_id, guild))
     except:
         user_xp[user_id] = amt
-    
+        guild = bot.get_guild(GUILD_ID)
+        if guild:
+            bot.loop.create_task(check_level_up(user_id, guild))
+
 async def handle_event(event, user_id):
     guild = bot.get_guild(GUILD_ID)
     member = guild.get_member(int(user_id))
