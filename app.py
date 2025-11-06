@@ -67,9 +67,7 @@ async def xp(ctx):
     embed.add_field(name="XP to Next Level", value=str(xp_needed), inline=True)
     
     await ctx.send(embed=embed)
-
-@bot.command(name="help")
-async def help_command(ctx):
+def help_embed():
     embed = nextcord.Embed(
         title="🏆 KwalaQuest Milestones",
         description="Complete these milestones to earn roles and XP!",
@@ -113,7 +111,21 @@ async def help_command(ctx):
         inline=False
     )
     
-    await ctx.send(embed=embed)
+    return embed
+# @bot.command(name="help")
+# async def help_command(ctx):
+#     embed = help_embed()
+#     await ctx.send(embed=embed)
+class CustomHelp(commands.HelpCommand):
+    async def send_bot_help(self, mapping):
+        embed = help_embed()
+        await self.get_destination().send(embed=embed)
+
+    async def send_command_help(self, command):
+        embed = help_embed()
+        await self.get_destination().send(embed=embed)
+
+bot.help_command = CustomHelp()
 
 @bot.command(name="unregister")
 async def unregister(ctx):
