@@ -193,6 +193,6 @@ def check():
 def run_flask():
     app.run(host="0.0.0.0", port=BOT_PORT)
 
-
-threading.Thread(target=run_flask).start()
-bot.run(TOKEN) 
+if __name__ == "__main__":
+    threading.Thread(target=run_flask).start()
+    bot.run(TOKEN) 
