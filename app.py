@@ -36,6 +36,7 @@ async def assign_role(member, role_name):
         await member.add_roles(role)
 
 def add_wallet(address, user_id):
+    address.strip()
     wallets.append(address)
     wallet_to_user_id[address] = user_id
 
@@ -237,7 +238,7 @@ def transfer_check(address, user_id):
     bot.loop.create_task(handle_event(event, user_id))
 
 def holder_check(address, user_id, balance):
-    if balance > 10000:
+    if balance >= 10000:
         event = "PLATINUM_WHALE"
     elif balance >= 5000:
         event = "DIAMOND_WHALE"
@@ -248,7 +249,7 @@ def holder_check(address, user_id, balance):
 @app.route("/transfer-event", methods=["POST"])
 def transfer_event():
     data = request.get_json()
-    print("Data from transfer event", data)
+    print(f"Data from transfer event {data}", flush=True)
     from_address = data['from_address']
     try:
         wallet_to_user_id[from_address]
@@ -267,7 +268,7 @@ def transfer_event():
 @app.route("/holder-event", methods=["POST"])
 def holder_event():
     data = request.get_json()
-    print("Data from holder event", data)
+    print("Data from holder event", data, flush=True)
     from_address = data['from_address']
     to_address = data['to_address']
     if to_address not in wallets:
