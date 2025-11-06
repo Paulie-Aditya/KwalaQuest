@@ -136,7 +136,7 @@ async def unregister(ctx):
     await ctx.send(f'<@{ctx.author.id}> has unregistered :(')
 
 def get_level(xp):
-    return xp // 1000  # Every 1000 XP is one level
+    return xp // 100  # Every 100 XP is one level
 
 async def check_level_up(user_id, guild):
     current_xp = user_xp[user_id]
