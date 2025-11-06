@@ -122,41 +122,73 @@ def discord_event():
     bot.loop.create_task(handle_event(event, user_id))
     return jsonify({"ok": True})
 
+def transfer_check(address, user_id):
+    count = tx_count[address]
+    if count == 50:
+        event = "FIFTY_TX"
+    elif count == 10:
+        event = "TEN_TX"
+    elif count == 1:
+        event = "FIRST_TX"
+
+    bot.loop.create_task(handle_event(event, user_id))
+
+def holder_check(address, user_id, balance):
+    if balance > 10000:
+        event = "PLATINUM_WHALE"
+    elif balance >= 5000:
+        event = "DIAMOND_WHALE"
+    elif balance >= 1000:
+        event = "GOLD_WHALE"
+    bot.loop.create_task(handle_event(event, user_id))
+
+@app.route("/transfer-event", methods=["POST"])
+def transfer_event():
+    data = request.get_json()
+    from_address = data['from_address']
+    try:
+        wallet_to_user_id[from_address]
+    except:
+        #address not registered
+        return {'message': "wallet not registered"}, 200
+    user_id = wallet_to_user_id[from_address]
+    try:
+        tx_count[from_address] = tx_count[from_address]+1
+    except:
+        tx_count[from_address] = 1
+    
+    transfer_check(from_address, user_id)
+    return {"message": "success"}, 200
+
+@app.route("/holder-event", methods=["POST"])
+def holder_event():
+    data = request.get_json()
+    from_address = data['from_address']
+    to_address = data['to_address']
+    if to_address not in wallets:
+        return {"message": "wallet not registered"}, 200
+    
+    user_id = wallet_to_user_id[to_address]
+    url = f"{COVALENT_API}?key={COVALENT_KEY}"
+    response = requests.get(url, timeout=10)
+    data = response.json()
+    items = data['data']['items']
+    for item in items:
+        if item['address'] != to_address:
+            continue
+        balance = int(item['balance'])/(10**int(item['contract_decimals']))
+        try: 
+            user_whale_role[to_address]
+        except:
+            user_whale_role[to_address] = 'none'
+        
+        holder_check(to_address, user_id, balance)
+    
+    return {"message": "success"}, 200
+
 @app.route("/", methods=["POST"])
 def check():
-    try:
-        pass
-        # here depending on the type of event, simply do
-        # bot.loop.create_task(handle_event(event, user_id))
-        # url = f"{COVALENT_API}?key={COVALENT_KEY}"
-        # response = requests.get(url, timeout=10)
-        # data = response.json()
-
-        # if "data" not in data or "items" not in data["data"]:
-        #     return jsonify({"error": "Bad Covalent response", "response": data}), 400
-        
-        # items = data['data']['items']
-        # holder_count = len(items)
-        # for item in items:
-        #     address = item['address']
-        #     balance = int(item['balance'])/(10**int(item['contract_decimals']))
-            
-        #     if address in wallets :
-        #         try: 
-        #             user_whale_role[address]
-        #         except:
-        #             user_whale_role[address] = 'none'
-
-                # res = check_whale(address, balance)
-                
-
-        return jsonify({"success": True})
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": str(e)}), 500
-
-
+    return jsonify({"success": True}), 200
 
 def run_flask():
     app.run(host="0.0.0.0", port=BOT_PORT)
