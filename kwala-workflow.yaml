@@ -1,4 +1,4 @@
-Name: KwalaQuestLive
+Name: KwalaQuestListener
 Trigger:
   TriggerSourceContract: 0x94219CCCaAD2af43121083e3DDaFb326d2f42cBF
   TriggerChainID: 137
