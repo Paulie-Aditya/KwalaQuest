@@ -1,4 +1,4 @@
-Name: KwalaQuestListener
+Name: KwalaQuestWorkflowLive
 Trigger:
   TriggerSourceContract: 0x94219CCCaAD2af43121083e3DDaFb326d2f42cBF
   TriggerChainID: 137
@@ -23,7 +23,7 @@ Actions:
     Type: post
     APIEndpoint: https://kwalaquest.onrender.com/transfer-event
     APIPayload:
-      from_address: re.event(\"^\\s*\\[\\s\"?([0-9a-zA-Zx]+)\"?\\s*\\]\\s*$\")
+      live: True
     TargetContract: NA
     TargetFunction: NA
     TargetParams:
@@ -36,7 +36,7 @@ Actions:
     Type: post
     APIEndpoint: https://kwalaquest.onrender.com/holder-event
     APIPayload:
-      message: hello world
+      message: holder check
     TargetContract: NA
     TargetFunction: NA
     TargetParams:

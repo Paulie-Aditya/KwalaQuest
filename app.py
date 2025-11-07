@@ -252,21 +252,23 @@ def holder_check(address, user_id, balance):
 @app.route("/transfer-event", methods=["POST"])
 def transfer_event():
     data = request.get_json()
-    print(f"Data from transfer event {data}", flush=True)
-    from_address = data['from_address'].lower()
     try:
-        print("From address: "+ from_address, flush=True)
-        wallet_to_user_id[from_address]
+        data['live']
     except:
-        #address not registered
-        return {'message': "wallet not registered"}, 200
-    user_id = wallet_to_user_id[from_address]
-    try:
-        tx_count[from_address] = tx_count[from_address]+1
-    except:
-        tx_count[from_address] = 1
-    
-    transfer_check(from_address, user_id)
+        return {"message":"different workflow"},200
+    for address in wallets:
+        url = f"https://api.covalenthq.com/v1/{CHAIN_ID}/address/{address}/transfers_v2/?contract-address={CONTRACT}&key={COVALENT_API}"
+        resp = requests.get(url, timeout=10)
+        data = resp.json()
+        latest_item = data["data"]["items"][0]["transfers"][0]
+        if latest_item["from_address"].lower() == address:
+            user_id = wallet_to_user_id[address]
+            try:
+                tx_count[address] = tx_count[address]+1
+            except:
+                tx_count[address] = 1
+            
+            transfer_check(address, user_id)
     return {"message": "success"}, 200
 
 @app.route("/holder-event", methods=["POST"])
@@ -276,6 +278,7 @@ def holder_event():
     data = response.json()
     items = data['data']['items']
     for item in items:
+        item['address'] = item['address'].lower()
         if item['address'] not in wallets:
             continue
         address = item['address']
