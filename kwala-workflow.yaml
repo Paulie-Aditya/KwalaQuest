@@ -1,0 +1,49 @@
+Name: KwalaQuestLive
+Trigger:
+  TriggerSourceContract: 0x94219CCCaAD2af43121083e3DDaFb326d2f42cBF
+  TriggerChainID: 137
+  TriggerEventName: Transfer(address,address,uint256)
+  TriggerEventFilter: NA
+  TriggerSourceContractABI: WwogIHsKICAgICJhbm9ueW1vdXMiOiBmYWxzZSwKICAgICJpbnB1dHMiOiBbCiAgICAgIHsiaW5kZXhlZCI6IHRydWUsICJpbnRlcm5hbFR5cGUiOiAiYWRkcmVzcyIsICJuYW1lIjogImZyb20iLCAidHlwZSI6ICJhZGRyZXNzIn0sCiAgICAgIHsiaW5kZXhlZCI6IHRydWUsICJpbnRlcm5hbFR5cGUiOiAiYWRkcmVzcyIsICJuYW1lIjogInRvIiwgInR5cGUiOiAiYWRkcmVzcyJ9LAogICAgICB7ImluZGV4ZWQiOiBmYWxzZSwgImludGVybmFsVHlwZSI6ICJ1aW50MjU2IiwgIm5hbWUiOiAidmFsdWUiLCAidHlwZSI6ICJ1aW50MjU2In0KICAgIF0sCiAgICAibmFtZSI6ICJUcmFuc2ZlciIsCiAgICAidHlwZSI6ICJldmVudCIKICB9Cl0K
+  TriggerPrice: NA
+  RecurringSourceContract: 0x94219CCCaAD2af43121083e3DDaFb326d2f42cBF
+  RecurringChainID: 137
+  RecurringEventName: Transfer(address,address,uint256)
+  RecurringEventFilter: NA
+  RecurringSourceContractABI: WwogIHsKICAgICJhbm9ueW1vdXMiOiBmYWxzZSwKICAgICJpbnB1dHMiOiBbCiAgICAgIHsiaW5kZXhlZCI6IHRydWUsICJpbnRlcm5hbFR5cGUiOiAiYWRkcmVzcyIsICJuYW1lIjogImZyb20iLCAidHlwZSI6ICJhZGRyZXNzIn0sCiAgICAgIHsiaW5kZXhlZCI6IHRydWUsICJpbnRlcm5hbFR5cGUiOiAiYWRkcmVzcyIsICJuYW1lIjogInRvIiwgInR5cGUiOiAiYWRkcmVzcyJ9LAogICAgICB7ImluZGV4ZWQiOiBmYWxzZSwgImludGVybmFsVHlwZSI6ICJ1aW50MjU2IiwgIm5hbWUiOiAidmFsdWUiLCAidHlwZSI6ICJ1aW50MjU2In0KICAgIF0sCiAgICAibmFtZSI6ICJUcmFuc2ZlciIsCiAgICAidHlwZSI6ICJldmVudCIKICB9Cl0K
+  RecurringPrice: NA
+  RepeatEvery: event
+  ExecuteAfter: immediate
+  ExpiresIn: 1781796603
+  Meta: Triggered whenever a Transfer event happens on the token
+  ActionStatusNotificationPOSTURL: https://workflow-notification-test.kalp.network/push_notification
+  ActionStatusNotificationAPIKey: NA
+Actions:
+  - Name: TX_COUNT_UPDATE
+    Type: post
+    APIEndpoint: https://kwalaquest.onrender.com/transfer-event
+    APIPayload:
+      from_address: re.event(\"^\\s*\\[\\s\"?([0-9a-zA-Zx]+)\"?\\s*\\]\\s*$\")
+    TargetContract: NA
+    TargetFunction: NA
+    TargetParams:
+    ChainID: NA
+    EncodedABI: NA
+    Bytecode: NA
+    Metadata: NA
+    RetriesUntilSuccess: 1
+  - Name: HOLDER_CHECK
+    Type: post
+    APIEndpoint: https://kwalaquest.onrender.com/holder-event
+    APIPayload:
+      message: hello world
+    TargetContract: NA
+    TargetFunction: NA
+    TargetParams:
+    ChainID: NA
+    EncodedABI: NA
+    Bytecode: NA
+    Metadata: NA
+    RetriesUntilSuccess: 1
+Execution:
+  Mode: parallel

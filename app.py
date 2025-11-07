@@ -244,6 +244,8 @@ def holder_check(address, user_id, balance):
         event = "DIAMOND_WHALE"
     elif balance >= 1000:
         event = "GOLD_WHALE"
+    else:
+        return
     bot.loop.create_task(handle_event(event, user_id))
 
 @app.route("/transfer-event", methods=["POST"])
@@ -266,29 +268,23 @@ def transfer_event():
     return {"message": "success"}, 200
 
 @app.route("/holder-event", methods=["POST"])
-def holder_event():
-    data = request.get_json()
-    print("Data from holder event", data, flush=True)
-    from_address = data['from_address']
-    to_address = data['to_address']
-    if to_address not in wallets:
-        return {"message": "wallet not registered"}, 200
-    
-    user_id = wallet_to_user_id[to_address]
+def holder_event():    
     url = f"{COVALENT_API}?key={COVALENT_KEY}"
     response = requests.get(url, timeout=10)
     data = response.json()
     items = data['data']['items']
     for item in items:
-        if item['address'] != to_address:
+        if item['address'] not in wallets:
             continue
+        address = item['address']
+        user_id = wallet_to_user_id[address]
         balance = int(item['balance'])/(10**int(item['contract_decimals']))
         try: 
-            user_whale_role[to_address]
+            user_whale_role[address]
         except:
-            user_whale_role[to_address] = 'none'
+            user_whale_role[address] = 'none'
         
-        holder_check(to_address, user_id, balance)
+        holder_check(address, user_id, balance)
     
     return {"message": "success"}, 200
 
