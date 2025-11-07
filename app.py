@@ -36,7 +36,7 @@ async def assign_role(member, role_name):
         await member.add_roles(role)
 
 def add_wallet(address, user_id):
-    address.strip()
+    address = address.strip().lower()
     wallets.append(address)
     wallet_to_user_id[address] = user_id
     print(wallet_to_user_id, flush=True)
@@ -252,7 +252,9 @@ def holder_check(address, user_id, balance):
 @app.route("/transfer-event", methods=["POST"])
 def transfer_event():
     for address in wallets:
-        url = f"https://api.covalenthq.com/v1/{CHAIN_ID}/address/{address}/transfers_v2/?contract-address={CONTRACT}&key={COVALENT_API}"
+        address = address.strip().lower()
+        print(address, flush=True)
+        url = f"https://api.covalenthq.com/v1/{CHAIN_ID}/address/{address}/transfers_v2/?contract-address={CONTRACT}&key={COVALENT_KEY}"
         resp = requests.get(url, timeout=10)
         data = resp.json()
         latest_item = data["data"]["items"][0]["transfers"][0]

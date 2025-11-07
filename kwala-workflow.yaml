@@ -1,4 +1,4 @@
-Name: KwalaQuestWorkflowLive
+Name: KwalaQuestYAML
 Trigger:
   TriggerSourceContract: 0x94219CCCaAD2af43121083e3DDaFb326d2f42cBF
   TriggerChainID: 137
@@ -23,7 +23,7 @@ Actions:
     Type: post
     APIEndpoint: https://kwalaquest.onrender.com/transfer-event
     APIPayload:
-      live: True
+      message: transfer check
     TargetContract: NA
     TargetFunction: NA
     TargetParams:
