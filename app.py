@@ -229,16 +229,22 @@ def discord_event():
 
 def transfer_check(address, user_id):
     count = tx_count[address]
+    event = ""
     if count == 50:
         event = "FIFTY_TX"
     elif count == 10:
         event = "TEN_TX"
     elif count == 1:
         event = "FIRST_TX"
+    else:
+        event = "none"
+    
+    print("Transfer event: ", event, flush=True)
 
     bot.loop.create_task(handle_event(event, user_id))
 
 def holder_check(address, user_id, balance):
+    event = ""
     if balance >= 10000:
         event = "PLATINUM_WHALE"
     elif balance >= 5000:
