@@ -39,10 +39,11 @@ def add_wallet(address, user_id):
     address.strip()
     wallets.append(address)
     wallet_to_user_id[address] = user_id
+    print(wallet_to_user_id, flush=True)
 
 @bot.command(name="register")
 async def register(ctx, *args):
-    wallet_addy = args[0]
+    wallet_addy = args[0].lower()
     user_id = ctx.author.id
     user_to_wallet_mapping[user_id] = wallet_addy
     # this particular wallet address has to be now tracked
@@ -252,8 +253,9 @@ def holder_check(address, user_id, balance):
 def transfer_event():
     data = request.get_json()
     print(f"Data from transfer event {data}", flush=True)
-    from_address = data['from_address']
+    from_address = data['from_address'].lower()
     try:
+        print("From address: "+ from_address, flush=True)
         wallet_to_user_id[from_address]
     except:
         #address not registered
