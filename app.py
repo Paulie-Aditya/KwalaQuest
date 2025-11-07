@@ -251,11 +251,6 @@ def holder_check(address, user_id, balance):
 
 @app.route("/transfer-event", methods=["POST"])
 def transfer_event():
-    data = request.get_json()
-    try:
-        data['live']
-    except:
-        return {"message":"different workflow"},200
     for address in wallets:
         url = f"https://api.covalenthq.com/v1/{CHAIN_ID}/address/{address}/transfers_v2/?contract-address={CONTRACT}&key={COVALENT_API}"
         resp = requests.get(url, timeout=10)
